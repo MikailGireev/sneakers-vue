@@ -1,0 +1,7 @@
+# Пример: заставляем все .js, .vue, .css, .html файлы храниться с LF
+# (даже если открыты на Windows)
+*.js   text eol=lf
+*.vue  text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+*.md   text eol=lf
