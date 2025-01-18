@@ -2,6 +2,10 @@
 import Card from './Card.vue';
 import { ref } from 'vue';
 
+defineProps({
+  items: Array,
+});
+
 const isAdded = ref(false);
 const isFavorite = ref(false);
 
@@ -16,9 +20,11 @@ const onClickAdd = () => {
 <template>
   <div class="grid grid-cols-4 gap-5">
     <Card
-      title="Мужские Кроссовки Nike Blazer Mid Suede"
-      imageUrl="/sneakers/sneakers-1.jpg"
-      :price="5000"
+      v-for="item in items"
+      :key="item.id"
+      :title="item.title"
+      :imageUrl="item.imageUrl"
+      :price="item.price"
       :isAdded="isAdded"
       :isFavorite="isFavorite"
       :onClickFavorite="onClickFavorite"
