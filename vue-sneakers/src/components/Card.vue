@@ -1,6 +1,7 @@
 <script setup>
 defineProps({
   title: String,
+  id: Number,
   imageUrl: String,
   price: Number,
   isFavorite: Boolean,

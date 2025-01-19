@@ -21,11 +21,50 @@ const onChangeInput = (event) => {
   filters.searchQuery = event.target.value;
 };
 
+const addFavorite = async (item) => {
+  try {
+    if (!item.isFavorite) {
+      const obj = {
+        parentId: item.id,
+      };
+      item.isFavorite = true;
+      const response = await axios.post(`https://e075628a4b9f3fb3.mokky.dev/favorites`, obj);
+      item.favoriteId = response.data.id;
+    } else {
+      item.isFavorite = false;
+      await axios.delete(`https://e075628a4b9f3fb3.mokky.dev/favorites/${item.favoriteId}`);
+      item.favoriteId = null;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const fetchFavorites = async () => {
+  try {
+    const response = await axios.get('https://e075628a4b9f3fb3.mokky.dev/favorites');
+    const favorites = response.data;
+    items.value = items.value.map((item) => {
+      const foundItem = favorites.find((favorite) => favorite.parentId === item.id);
+      if (!foundItem) {
+        return item;
+      }
+
+      return {
+        ...item,
+        isFavorite: true,
+        favoriteId: foundItem.id,
+      };
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const fetchItems = async () => {
   try {
     const params = {
       sortBy: filters.sortBy,
-      // searchQuery: filters.searchQuery,
     };
 
     if (filters.searchQuery) {
@@ -33,13 +72,21 @@ const fetchItems = async () => {
     }
 
     const response = await axios.get(`https://e075628a4b9f3fb3.mokky.dev/items`, { params });
-    items.value = response.data;
+    items.value = response.data.map((object) => ({
+      ...object,
+      isAdded: false,
+      favoriteId: null,
+      isFavorite: false,
+    }));
   } catch (error) {
     console.log(error);
   }
 };
 
-onMounted(fetchItems);
+onMounted(async () => {
+  await fetchItems();
+  await fetchFavorites();
+});
 
 watch(filters, fetchItems);
 </script>
@@ -76,7 +123,7 @@ watch(filters, fetchItems);
         </div>
 
         <div class="mt-8">
-          <CardList :items="items" />
+          <CardList :items="items" @addFavorite="addFavorite" />
         </div>
       </div>
     </div>
