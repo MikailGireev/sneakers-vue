@@ -8,11 +8,15 @@ import Drawer from './components/Drawer.vue';
 
 const items = ref([]);
 const cartItems = ref([]);
+const isCreatingOrder = ref(false);
 
 const isDrawerOpen = ref(false);
 
 const totalPrice = computed(() => cartItems.value.reduce((acc, item) => acc + item.price, 0));
 const vatPrice = computed(() => Math.round((totalPrice.value * 5) / 100));
+
+const cartEmpty = computed(() => cartItems.value.length === 0);
+const cartButtonDisabled = computed(() => isCreatingOrder.value || cartEmpty.value);
 
 const closeDrawer = () => {
   isDrawerOpen.value = false;
@@ -47,6 +51,7 @@ const removeFromCart = (item) => {
 
 const createOrder = async () => {
   try {
+    isCreatingOrder.value = true;
     const response = await axios.post('https://e075628a4b9f3fb3.mokky.dev/orders', {
       items: cartItems.value,
       totalPrice: totalPrice.value,
@@ -55,6 +60,8 @@ const createOrder = async () => {
     return response.data;
   } catch (e) {
     console.log(e);
+  } finally {
+    isCreatingOrder.value = false;
   }
 };
 
@@ -140,6 +147,13 @@ onMounted(async () => {
 
 watch(filters, fetchItems);
 
+watch(cartItems, () => {
+  items.value = items.value.map((item) => ({
+    ...item,
+    isAdded: false,
+  }));
+});
+
 provide('cart', {
   cartItems,
   closeDrawer,
@@ -155,6 +169,7 @@ provide('cart', {
       :total-price="totalPrice"
       :vat-price="vatPrice"
       @create-order="createOrder"
+      :cart-button-disabled="cartButtonDisabled"
     />
 
     <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">

@@ -1,13 +1,13 @@
 <script setup>
 import DrawerHead from './DrawerHead.vue';
 import CartItemList from './CartItemList.vue';
+const emit = defineEmits(['createOrder']);
 
 defineProps({
   totalPrice: Number,
   vatPrice: Number,
+  cartButtonDisabled: Boolean,
 });
-
-const emit = defineEmits(['createOrder']);
 </script>
 
 <template>
@@ -30,7 +30,7 @@ const emit = defineEmits(['createOrder']);
           <b>{{ vatPrice }} р.</b>
         </div>
         <button
-          :disabled="totalPrice ? false : true"
+          :disabled="cartButtonDisabled"
           @click="() => emit('createOrder')"
           class="mt-4 bg-lime-500 w-full rounded-xl py-3 disabled:bg-slate-300 text-white hover:bg-lime-600 transition active:bg-lime-700 cursor-pointer"
         >
