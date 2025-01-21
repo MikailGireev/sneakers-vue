@@ -141,8 +141,16 @@ const fetchItems = async () => {
 };
 
 onMounted(async () => {
+  const localCart = localStorage.getItem('cartItems');
+  cartItems.value = localCart ? JSON.parse(localCart) : [];
+
   await fetchItems();
   await fetchFavorites();
+
+  items.value = items.value.map((item) => ({
+    ...item,
+    isAdded: cartItems.value.some((cartItem) => cartItem.id === item.id),
+  }));
 });
 
 watch(filters, fetchItems);
@@ -153,6 +161,14 @@ watch(cartItems, () => {
     isAdded: false,
   }));
 });
+
+watch(
+  cartItems,
+  () => {
+    localStorage.setItem('cartItems', JSON.stringify(cartItems.value));
+  },
+  { deep: true },
+);
 
 provide('cart', {
   cartItems,
