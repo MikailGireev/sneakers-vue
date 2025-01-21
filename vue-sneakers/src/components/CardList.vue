@@ -3,6 +3,8 @@ import Card from './Card.vue';
 
 defineProps({
   items: Array,
+  isFavorites: Boolean,
+  isAdd: Boolean,
 });
 
 const emit = defineEmits(['addFavorite, addCart']);
@@ -19,8 +21,8 @@ const emit = defineEmits(['addFavorite, addCart']);
       :price="item.price"
       :isAdded="item.isAdded"
       :isFavorite="item.isFavorite"
-      :onClickFavorite="() => emit('addFavorite', item)"
-      :onClickAdd="() => emit('addCart', item)"
+      :onClickFavorite="isFavorites ? null : () => emit('addFavorite', item)"
+      :onClickAdd="isAdd ? null : () => emit('addCart', item)"
     />
   </div>
 </template>
